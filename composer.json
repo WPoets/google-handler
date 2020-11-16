@@ -18,14 +18,11 @@
     "require": {
         "php": ">=7.0",
         "google/apiclient": "^2.7",
+        "composer/installers": "~1.0",
         "oomphinc/composer-installers-extender": "^2.0"
     },
-	 "extra": {
-        "installer-types": ["awesome-handler"],
+	 "extra": { 
 		"installer-name": "google",
-        "installer-paths": {
-            "extra-handlers/{$name}/": ["type:awesome-handler"]
-        }
     },
     "config": {
 		"process-timeout": 600,
