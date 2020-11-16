@@ -1,0 +1,35 @@
+{
+    "name": "wpoets/google-handler",
+    "license": "GPL-3.0-or-later",
+    "type": "awesome-handler",
+    "description": "Google API Integration handler for Awesome enterprise",
+	"keywords": ["WordPress", "Low Code"," Awesome Enterprise","Shortcode","Google API"],
+	"homepage": "https://getawesomestudio.com/",
+	"authors": [
+		{
+            "name": "Amit Singh",
+            "homepage": "https://www.wpoets.com"
+        }
+       
+    ],
+	 "support": {
+        "docs": "https://www.getawesomestudio.com/enterprise-tutorial/"
+    },
+    "require": {
+        "php": ">=7.0",
+        "google/apiclient": "^2.7",
+        "oomphinc/composer-installers-extender": "^2.0"
+    },
+	 "extra": {
+        "installer-types": ["awesome-handler"],
+		"installer-name": "google"
+        "installer-paths": {
+            "extra-handlers/{$name}/": ["type:awesome-handler"]
+        }
+    },
+    "config": {
+		"process-timeout": 600,
+        "sort-packages": true
+    },
+	"prefer-stable": true
+}
