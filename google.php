@@ -19,7 +19,7 @@ function login_url($atts,$content=null,$shortcode){
 	if(empty($ticket_id)) return '';
 	if(empty($app_id) || empty($app_secret)) return '';	
 	
-	require_once __DIR__ . 'vendor/autoload.php';
+	require_once AWESOME_PATH.'/vendor/autoload.php';
 	
 	$return_value='';
 	
@@ -71,7 +71,7 @@ function auth($atts,$content=null,$shortcode){
 	
 	$path = plugin_dir_path( __DIR__ );
 	
-	require_once __DIR__ . 'vendor/autoload.php';
+	require_once AWESOME_PATH.'/vendor/autoload.php';
 	
 	if (isset($_GET['error']) || !isset($_GET['code'])) {
 	  \aw2\session_ticket\set(["main"=>$ticket_id,"field"=>'status',"value"=>'error'],null,null);
