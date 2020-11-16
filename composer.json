@@ -22,7 +22,7 @@
         "oomphinc/composer-installers-extender": "^2.0"
     },
 	 "extra": { 
-		"installer-name": "google",
+		"installer-name": "google"
     },
     "config": {
 		"process-timeout": 600,
