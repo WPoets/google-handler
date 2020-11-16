@@ -22,7 +22,7 @@
     },
 	 "extra": {
         "installer-types": ["awesome-handler"],
-		"installer-name": "google"
+		"installer-name": "google",
         "installer-paths": {
             "extra-handlers/{$name}/": ["type:awesome-handler"]
         }
