@@ -130,3 +130,110 @@ if(IS_WP){
 		die();
 	}
 }	
+
+\aw2_library::add_service('google.auth_offline', 'Get access token for business profile API', ['namespace' => __NAMESPACE__]);
+
+function auth_offline($atts, $content = null, $shortcode) {
+
+    if (\aw2_library::pre_actions('all', $atts, $content) == false) {
+        return;
+    }
+
+
+    extract(\aw2_library::shortcode_atts([
+    'client_id' => 'client_id',
+    'client_secret' => 'client_secret',
+    'redirect_uri' => 'redirect_uri',
+    'scope' => 'scope'
+], $atts));
+
+    if (empty($client_id) || empty($client_secret) || empty($redirect_uri) || empty($scope)) {
+        return '';
+    }
+	
+	global $wpdb;
+	
+	$table_name = $wpdb->prefix . 'google_access_tokens';
+	$query = $wpdb->prepare("SELECT * FROM $table_name WHERE client_id = %s ORDER BY id DESC LIMIT 1", $client_id); 
+	$tokens = $wpdb->get_row($query, ARRAY_A);
+	$access_token = isset($tokens['access_token']) ? $tokens['access_token'] : null;
+	$refresh_token = isset($tokens['refresh_token']) ? $tokens['refresh_token'] : null;
+	
+
+    // Initialization of Google client instance
+    $client = new Google_Client();
+    $client->setClientId($client_id);
+    $client->setClientSecret($client_secret);
+    $client->setRedirectUri($redirect_uri);
+    $client->setScopes([$scope]);
+    $client->setAccessType('offline');
+    $client->setApprovalPrompt('force');
+
+    // Check if access token is provided
+    if ($access_token) {
+    $client->setAccessToken($access_token);
+    // Check if access token is expired
+    if (!$client->isAccessTokenExpired()) {
+      return $access_token;
+    } else {
+
+      // Try to refresh access token using refresh token
+      if ($refresh_token) {
+        try {
+          $client->refreshToken($refresh_token);
+          $new_access_token = $client->getAccessToken();
+			$wpdb->update(
+                        $table_name,
+                        array('access_token' => $new_access_token['access_token']),
+                        array('client_id' => $client_id)
+                    );
+          return $new_access_token;
+        } catch (Exception $e) {
+          return false; 
+        }
+      } else {
+        return false; 
+      }
+    }
+  }
+
+  // Check if authorization code is present in the request
+  if (isset($_GET['code'])) {
+    // Exchange authorization code for access and refresh tokens
+    try {
+      $client->authenticate($_GET['code']);
+      $access_token = $client->getAccessToken();
+      $refresh_token = (isset($access_token['refresh_token'])) ? $access_token['refresh_token'] : null;
+		
+	   // Create table if not exists
+        $table_name = $wpdb->prefix . 'google_access_tokens';
+        $charset_collate = $wpdb->get_charset_collate();
+        $create_table_query = "CREATE TABLE IF NOT EXISTS $table_name (
+                id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                client_id VARCHAR(255) NOT NULL,
+                access_token VARCHAR(255) NOT NULL,
+                refresh_token VARCHAR(255),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) $charset_collate;";
+        
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        dbDelta( $create_table_query );
+        
+        // Insert tokens into the table
+        $access_token_value = $access_token['access_token'];
+        $refresh_token_value = $refresh_token;
+        $insert_query = $wpdb->prepare("INSERT INTO $table_name (client_id, access_token, refresh_token) VALUES (%s, %s, %s)", $client_id, $access_token_value, $refresh_token_value);
+        $wpdb->query($insert_query);
+      return $access_token;
+    } catch (Exception $e) {
+      return false; 
+    }
+  }
+
+  // No access token or authorization code, redirect user for authorization
+  if (!isset($_GET['code'])) {
+    $authUrl = $client->createAuthUrl();
+    header('Location: ' . $authUrl);
+    exit;
+  }
+}
