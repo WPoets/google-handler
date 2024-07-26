@@ -152,7 +152,6 @@ function auth_offline($atts, $content = null, $shortcode) {
 	
 	global $wpdb;
 	
-  
 	$table_name = $wpdb->prefix . 'google_access_tokens';
 	$query = $wpdb->prepare("SELECT * FROM $table_name WHERE client_id = %s ORDER BY id DESC LIMIT 1", $client_id); 
 	$tokens = $wpdb->get_row($query, ARRAY_A);
