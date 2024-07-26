@@ -139,8 +139,6 @@ function auth_offline($atts, $content = null, $shortcode) {
         return;
     }
 
-    require_once AWESOME_PATH.'/vendor/autoload.php';
-
     extract(\aw2_library::shortcode_atts([
     'client_id' => 'client_id',
     'client_secret' => 'client_secret',
