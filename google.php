@@ -139,7 +139,6 @@ function auth_offline($atts, $content = null, $shortcode) {
         return;
     }
 
-
     extract(\aw2_library::shortcode_atts([
     'client_id' => 'client_id',
     'client_secret' => 'client_secret',
@@ -161,7 +160,7 @@ function auth_offline($atts, $content = null, $shortcode) {
 	
 
     // Initialization of Google client instance
-    $client = new Google_Client();
+    $client = new \Google_Client();
     $client->setClientId($client_id);
     $client->setClientSecret($client_secret);
     $client->setRedirectUri($redirect_uri);
